@@ -3,7 +3,21 @@ import { useEffect, useState } from 'react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { Toaster } from 'sonner';
 
-import { AccessLandingPage, LoginPage, RecoverAccessPage } from '@features/access';
+import {
+  AcademicDashboardPage,
+  ArticlesPage,
+  ClassesPage,
+  CoursesPage,
+  EventsPage,
+  TeamsPage,
+} from '@features/academic';
+import {
+  AccessAccountPage,
+  AccessLandingPage,
+  LoginPage,
+  PasswordSetupPage,
+  RecoverAccessPage,
+} from '@features/access';
 import { ArticleEditorPage, ChooseTemplatePage } from '@features/articles';
 import { InstitutionsPage } from '@features/institutions';
 
@@ -11,20 +25,41 @@ const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
       refetchOnWindowFocus: true,
-      staleTime: 30_000,
       retry: 1,
+      staleTime: 30_000,
     },
   },
 });
 
 type RouteKey =
-  'landing' | 'login' | 'recoverAccess' | 'institutions' | 'articleEditor' | 'chooseTemplate';
+  | 'landing'
+  | 'login'
+  | 'recoverAccess'
+  | 'passwordSetup'
+  | 'dashboard'
+  | 'institutions'
+  | 'courses'
+  | 'classes'
+  | 'events'
+  | 'teams'
+  | 'articles'
+  | 'accessAccount'
+  | 'articleEditor'
+  | 'chooseTemplate';
 
 const routeTitle: Record<RouteKey, string> = {
+  accessAccount: 'Acesso | VinceArt',
+  articles: 'Artigos | VinceArt',
+  classes: 'Turmas | VinceArt',
+  courses: 'Cursos | VinceArt',
+  dashboard: 'Dashboard | VinceArt',
+  events: 'Eventos | VinceArt',
+  institutions: 'Instituições | VinceArt',
   landing: 'VinceArt | Academic Portal',
   login: 'Entrar | VinceArt',
+  passwordSetup: 'Definir senha | VinceArt',
   recoverAccess: 'Recuperar acesso | VinceArt',
-  institutions: 'Instituições | VinceArt',
+  teams: 'Equipes | VinceArt',
   articleEditor: 'Editor de Artigo - VinceArt',
   chooseTemplate: 'Escolher Modelo do Artigo - VinceArt',
 };
@@ -38,6 +73,18 @@ function resolveRoute(pathname: string): RouteKey {
     return 'recoverAccess';
   }
 
+  if (pathname === '/definir-senha' || pathname === '/reset-password') {
+    return 'passwordSetup';
+  }
+
+  if (pathname === '/admin' || pathname === '/admin/dashboard' || pathname === '/dashboard') {
+    return 'dashboard';
+  }
+
+  if (pathname === '/admin/acesso' || pathname === '/perfil') {
+    return 'accessAccount';
+  }
+
   if (pathname === '/admin/instituicoes' || pathname === '/instituicoes') {
     return 'institutions';
   }
@@ -48,6 +95,26 @@ function resolveRoute(pathname: string): RouteKey {
 
   if (pathname === '/artigos/modelo') {
     return 'chooseTemplate';
+  }
+
+  if (pathname === '/admin/cursos' || pathname === '/cursos') {
+    return 'courses';
+  }
+
+  if (pathname === '/admin/turmas' || pathname === '/turmas') {
+    return 'classes';
+  }
+
+  if (pathname === '/admin/eventos' || pathname === '/eventos') {
+    return 'events';
+  }
+
+  if (pathname === '/admin/equipes' || pathname === '/equipes') {
+    return 'teams';
+  }
+
+  if (pathname === '/admin/artigos' || pathname === '/artigos') {
+    return 'articles';
   }
 
   return 'landing';
@@ -72,7 +139,7 @@ function useRoute() {
   function navigateTo(pathname: string) {
     window.history.pushState({}, '', pathname);
     setRoute(resolveRoute(pathname));
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+    window.scrollTo({ behavior: 'smooth', top: 0 });
   }
 
   return { navigateTo, route };
@@ -84,12 +151,25 @@ export function App() {
   return (
     <QueryClientProvider client={queryClient}>
       {route === 'landing' && <AccessLandingPage />}
-      {route === 'login' && <LoginPage onAuthenticated={() => navigateTo('/admin/instituicoes')} />}
+      {route === 'login' && (
+        <LoginPage
+          onAuthenticated={() => navigateTo('/admin/dashboard')}
+          onPasswordSetup={() => navigateTo('/definir-senha')}
+        />
+      )}
       {route === 'recoverAccess' && <RecoverAccessPage />}
+      {route === 'passwordSetup' && <PasswordSetupPage />}
+      {route === 'dashboard' && <AcademicDashboardPage />}
       {route === 'institutions' && <InstitutionsPage />}
+      {route === 'courses' && <CoursesPage />}
+      {route === 'classes' && <ClassesPage />}
+      {route === 'events' && <EventsPage />}
+      {route === 'teams' && <TeamsPage />}
+      {route === 'articles' && <ArticlesPage />}
+      {route === 'accessAccount' && <AccessAccountPage />}
       {route === 'articleEditor' && <ArticleEditorPage />}
       {route === 'chooseTemplate' && <ChooseTemplatePage />}
-      <Toaster richColors closeButton />
+      <Toaster closeButton richColors />
     </QueryClientProvider>
   );
 }
