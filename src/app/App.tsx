@@ -4,6 +4,7 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { Toaster } from 'sonner';
 
 import { AccessLandingPage, LoginPage, RecoverAccessPage } from '@features/access';
+import { ArticleEditorPage, ChooseTemplatePage } from '@features/articles';
 import { InstitutionsPage } from '@features/institutions';
 
 const queryClient = new QueryClient({
@@ -16,13 +17,16 @@ const queryClient = new QueryClient({
   },
 });
 
-type RouteKey = 'landing' | 'login' | 'recoverAccess' | 'institutions';
+type RouteKey =
+  'landing' | 'login' | 'recoverAccess' | 'institutions' | 'articleEditor' | 'chooseTemplate';
 
 const routeTitle: Record<RouteKey, string> = {
   landing: 'VinceArt | Academic Portal',
   login: 'Entrar | VinceArt',
   recoverAccess: 'Recuperar acesso | VinceArt',
   institutions: 'Instituições | VinceArt',
+  articleEditor: 'Editor de Artigo - VinceArt',
+  chooseTemplate: 'Escolher Modelo do Artigo - VinceArt',
 };
 
 function resolveRoute(pathname: string): RouteKey {
@@ -36,6 +40,14 @@ function resolveRoute(pathname: string): RouteKey {
 
   if (pathname === '/admin/instituicoes' || pathname === '/instituicoes') {
     return 'institutions';
+  }
+
+  if (pathname === '/artigos/editor') {
+    return 'articleEditor';
+  }
+
+  if (pathname === '/artigos/modelo') {
+    return 'chooseTemplate';
   }
 
   return 'landing';
@@ -75,6 +87,8 @@ export function App() {
       {route === 'login' && <LoginPage onAuthenticated={() => navigateTo('/admin/instituicoes')} />}
       {route === 'recoverAccess' && <RecoverAccessPage />}
       {route === 'institutions' && <InstitutionsPage />}
+      {route === 'articleEditor' && <ArticleEditorPage />}
+      {route === 'chooseTemplate' && <ChooseTemplatePage />}
       <Toaster richColors closeButton />
     </QueryClientProvider>
   );
